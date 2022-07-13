@@ -334,3 +334,33 @@ class DQNAgent:
 
 
 agent = DQNAgent()
+for episode in tqdm(range(1,EPISODES+1),ascii=True, unit='episode'):
+    agent.tensorboard.step = episode
+
+    episode_reward = 0
+    step = 1
+    current_state = env.reset()
+
+
+    done = False
+
+    while not done:
+        if np.random.random() > epsilon:
+            action = np.argmax(agent.get_qs(current_state))
+        else:
+            action = np.random.randint(0,env.ACTION_SPACE_SIZE)
+        
+        new_state, reward, done = env.step(action)
+
+        episode_reward += reward
+
+        if SHOW_PREVIEW and not episode % AGGREGATE_STATS_EVERY:
+            env.render()
+
+        agent.update_replay_memory((current_state, action, reward, new_state, done))
+        agent.train(done, step)
+
+        current_state = new_state
+        step += 1
+
+        ### stamatisa sto 28:10 - training and testing deep reinforcment learning agent.
